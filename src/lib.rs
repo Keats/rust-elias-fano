@@ -26,11 +26,7 @@ pub struct EliasFano {
 #[derive(Debug)]
 pub struct OutOfBoundsError;
 
-impl Error for OutOfBoundsError {
-    fn description(&self) -> &str {
-        "Index out of bounds"
-    }
-}
+impl Error for OutOfBoundsError {}
 
 impl fmt::Display for OutOfBoundsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
