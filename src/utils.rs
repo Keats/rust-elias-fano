@@ -38,6 +38,6 @@ mod tests {
         assert_eq!(1, msb(3));
         assert_eq!(4, msb(30));
         assert_eq!(6, msb(91));
-        assert_eq!(63, msb(<u64>::max_value()));
+        assert_eq!(63, msb(u64::MAX));
     }
 }

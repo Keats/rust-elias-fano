@@ -62,10 +62,10 @@ fn test_skip() {
 
     ef.compress(array.iter());
 
-    ef.skip(500);
+    ef.skip(500).unwrap();
     assert_eq!(ef.value(), 500);
 
-    ef.skip(350);
+    ef.skip(350).unwrap();
     assert_eq!(ef.value(), 850);
 
     assert!(ef.skip(149).is_ok());

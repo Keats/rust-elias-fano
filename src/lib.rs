@@ -1,14 +1,14 @@
-extern crate fixedbitset;
-
-mod utils;
-
-use utils::*;
-
-use fixedbitset::FixedBitSet;
 use std::error::Error;
 use std::fmt;
 
-#[derive(Debug)]
+mod utils;
+
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+use fixedbitset::FixedBitSet;
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, )]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct EliasFano {
     universe: u64,
     n: u64,
@@ -40,7 +40,7 @@ impl fmt::Display for OutOfBoundsError {
 
 impl EliasFano {
     pub fn new(universe: u64, n: u64) -> EliasFano {
-        let lower_bits = if universe > n { msb(universe / n) } else { 0 };
+        let lower_bits = if universe > n { utils::msb(universe / n) } else { 0 };
         let higher_bits_length = n + (universe >> lower_bits) + 2;
         let mask = (1_u64 << lower_bits) - 1;
         let lower_bits_offset = higher_bits_length;
@@ -83,7 +83,7 @@ impl EliasFano {
             self.b.set(high as usize, true);
 
             let offset = self.lower_bits_offset + (i as u64 * self.lower_bits);
-            set_bits(&mut self.b, offset, low, self.lower_bits);
+            utils::set_bits(&mut self.b, offset, low, self.lower_bits);
 
             last = *elem;
 
@@ -109,7 +109,7 @@ impl EliasFano {
 
         let skip = position - self.position;
         let pos = (0..skip).fold(self.high_bits_pos, |pos, _| {
-            get_next_set(&self.b, (pos + 1) as usize)
+            utils::get_next_set(&self.b, (pos + 1) as usize)
         });
 
         self.high_bits_pos = (pos - 1) as u64;
@@ -163,7 +163,7 @@ impl EliasFano {
             self.high_bits_pos
         };
 
-        self.high_bits_pos = get_next_set(&self.b, pos as usize) as u64;
+        self.high_bits_pos = utils::get_next_set(&self.b, pos as usize) as u64;
 
         let mut low = 0;
         let offset = self.lower_bits_offset + self.position * self.lower_bits;
