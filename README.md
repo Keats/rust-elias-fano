@@ -13,7 +13,8 @@ This implementation is based largely on one written in Go by [Antonio Mallia](ht
 ## Todo:
 - [x] Tests
 - [x] Example usage
-- [ ] Benchmarks, comparison with other implementations
+- [x] Benchmarks
+- [ ] Comparison with other implementations
 
 ## Installation
 Add the following line to your Cargo.toml:
