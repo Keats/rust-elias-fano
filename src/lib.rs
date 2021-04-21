@@ -3,11 +3,11 @@ use std::fmt;
 
 mod utils;
 
-#[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
 use fixedbitset::FixedBitSet;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, )]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct EliasFano {
     universe: u64,
@@ -36,7 +36,11 @@ impl fmt::Display for OutOfBoundsError {
 
 impl EliasFano {
     pub fn new(universe: u64, n: u64) -> EliasFano {
-        let lower_bits = if universe > n { utils::msb(universe / n) } else { 0 };
+        let lower_bits = if universe > n {
+            utils::msb(universe / n)
+        } else {
+            0
+        };
         let higher_bits_length = n + (universe >> lower_bits) + 2;
         let mask = (1_u64 << lower_bits) - 1;
         let lower_bits_offset = higher_bits_length;
