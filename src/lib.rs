@@ -29,7 +29,7 @@ pub struct EliasFano {
 pub enum Error {
     OutOfBounds,
     Unsorted,
-    GreaterThanUniverse
+    GreaterThanUniverse,
 }
 
 impl StdError for Error {}
@@ -41,7 +41,6 @@ impl fmt::Display for Error {
             Error::Unsorted => write!(f, "The iterator was not sorted"),
             Error::GreaterThanUniverse => write!(f, "A value greater than the universe was found"),
         }
-
     }
 }
 
@@ -164,6 +163,16 @@ impl EliasFano {
 
     pub fn size(&self) -> u64 {
         self.n
+    }
+
+    pub fn into_vec(mut self) -> Vec<u64> {
+        self.reset();
+        let mut vals = Vec::with_capacity(self.size() as usize);
+        vals.push(self.value());
+        while let Ok(v) = self.next() {
+            vals.push(v);
+        }
+        vals
     }
 
     fn read_current_value(&mut self) {

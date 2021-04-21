@@ -190,3 +190,18 @@ fn test_generic() {
         );
     }
 }
+
+#[test]
+fn test_into_vec() {
+    const NUM: u64 = 1000;
+    let mut ef = EliasFano::new(NUM, NUM);
+    let array: Vec<u64> = vec![0; NUM as usize]
+        .iter()
+        .enumerate()
+        .map(|(idx, _)| idx as u64)
+        .collect();
+    ef.compress(array.iter()).unwrap();
+    let vals = ef.into_vec();
+    assert_eq!(array.len(), vals.len());
+    assert_eq!(array, vals);
+}

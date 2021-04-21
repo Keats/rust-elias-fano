@@ -19,13 +19,11 @@ This implementation is based largely on one written in Go by [Antonio Mallia](ht
 Add the following line to your Cargo.toml:
 ```diff
 [dependencies]
-+ elias-fano = "1.1.0"
++ elias-fano = "2"
 ```
 
 ## Example Usage
 ```rust
-extern crate elias_fano;
-
 use elias_fano::EliasFano;
 
 fn main() {
@@ -34,7 +32,7 @@ fn main() {
 
     let mut ef = EliasFano::new(sorted_array[size - 1], size as u64);
 
-    ef.compress(sorted_array.iter());
+    ef.compress(sorted_array.iter()).expect("Failed to compress");
 
     println!("{}", ef.value()); // 1
 
