@@ -1,5 +1,3 @@
-extern crate fixedbitset;
-
 use fixedbitset::FixedBitSet;
 
 pub fn get_next_set(bitset: &FixedBitSet, index: usize) -> u64 {

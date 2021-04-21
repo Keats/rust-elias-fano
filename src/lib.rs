@@ -73,10 +73,7 @@ impl EliasFano {
         }
     }
 
-    pub fn compress<'a, I>(&mut self, elems: I) -> Result<(), Error>
-    where
-        I: Iterator<Item = &'a u64>,
-    {
+    pub fn compress<'a>(&mut self, elems: impl Iterator<Item = &'a u64>) -> Result<(), Error> {
         let mut last = 0_u64;
 
         for (i, elem) in elems.enumerate() {

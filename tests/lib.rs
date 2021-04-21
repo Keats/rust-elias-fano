@@ -1,5 +1,3 @@
-extern crate elias_fano;
-
 use elias_fano::EliasFano;
 
 #[test]
