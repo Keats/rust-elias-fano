@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::error::Error as StdError;
 use std::fmt;
 
 mod utils;
@@ -10,7 +10,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct EliasFano {
+    /// The maximum value of the sequence
     universe: u64,
+    /// The number of elements in the sequence
     n: u64,
     lower_bits: u64,
     higher_bits_length: u64,
@@ -23,14 +25,23 @@ pub struct EliasFano {
     high_bits_pos: u64,
 }
 
-#[derive(Debug)]
-pub struct OutOfBoundsError;
+#[derive(Debug, PartialEq, Eq)]
+pub enum Error {
+    OutOfBounds,
+    Unsorted,
+    GreaterThanUniverse
+}
 
-impl Error for OutOfBoundsError {}
+impl StdError for Error {}
 
-impl fmt::Display for OutOfBoundsError {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Index out of range attempted to be accessed")
+        match self {
+            Error::OutOfBounds => write!(f, "Index out of range attempted to be accessed"),
+            Error::Unsorted => write!(f, "The iterator was not sorted"),
+            Error::GreaterThanUniverse => write!(f, "A value greater than the universe was found"),
+        }
+
     }
 }
 
@@ -62,7 +73,7 @@ impl EliasFano {
         }
     }
 
-    pub fn compress<'a, I>(&mut self, elems: I)
+    pub fn compress<'a, I>(&mut self, elems: I) -> Result<(), Error>
     where
         I: Iterator<Item = &'a u64>,
     {
@@ -70,11 +81,11 @@ impl EliasFano {
 
         for (i, elem) in elems.enumerate() {
             if i > 0 && *elem < last {
-                panic!("Sequence is not sorted");
+                return Err(Error::Unsorted);
             }
 
             if *elem > self.universe {
-                panic!("Element {} is greater than universe", elem);
+                return Err(Error::GreaterThanUniverse);
             }
 
             let high = (elem >> self.lower_bits) + i as u64 + 1;
@@ -92,11 +103,13 @@ impl EliasFano {
                 self.high_bits_pos = high;
             }
         }
+
+        Ok(())
     }
 
-    pub fn visit(&mut self, position: u64) -> Result<u64, OutOfBoundsError> {
+    pub fn visit(&mut self, position: u64) -> Result<u64, Error> {
         if position > self.size() {
-            return Err(OutOfBoundsError);
+            return Err(Error::OutOfBounds);
         }
 
         if self.position == position {
@@ -118,18 +131,18 @@ impl EliasFano {
         Ok(self.value())
     }
 
-    pub fn next(&mut self) -> Result<u64, OutOfBoundsError> {
+    pub fn next(&mut self) -> Result<u64, Error> {
         self.position += 1;
 
         if self.position >= self.size() {
-            return Err(OutOfBoundsError);
+            return Err(Error::OutOfBounds);
         }
 
         self.read_current_value();
         Ok(self.value())
     }
 
-    pub fn skip(&mut self, n: u64) -> Result<u64, OutOfBoundsError> {
+    pub fn skip(&mut self, n: u64) -> Result<u64, Error> {
         let new_pos = self.position() + n;
         self.visit(new_pos)
     }
